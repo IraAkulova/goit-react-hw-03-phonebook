@@ -7,26 +7,32 @@ import css from '../components/App.module.css'
 
 export class App extends Component {
   state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
+    contacts: [],
     filter: '',
   };
 
+  componentDidMount() {
+    const parsedContacts = JSON.parse(localStorage.getItem('contacts'));
+    if (!parsedContacts) {
+      return;
+    }
+    return this.setState({ contacts: parsedContacts });
+  }
+
   formSubmitHandler = data => {
-    const contExist = this.state.contacts.find(contact =>
-      contact.name.toLowerCase() === data.name.toLocaleLowerCase());
-    
+    const contExist = this.state.contacts.find(
+      contact => contact.name.toLowerCase() === data.name.toLocaleLowerCase()
+    );
     data.id = nanoid();
     const newContacts = this.state.contacts;
-    newContacts.push(data);
 
-    return contExist
-      ? alert(`${data.name} is already in contacts list!`)
-      : this.setState({ contacts: newContacts });
+    if (!contExist) {
+      newContacts.push(data);
+      localStorage.setItem('contacts', JSON.stringify(newContacts));
+      return this.setState({ contacts: newContacts });
+    };
+
+    return alert(`${data.name} is already in contacts list!`);
   };
 
   filterChange = e => {
@@ -40,8 +46,15 @@ export class App extends Component {
     );
   };
 
-  deleteContact = (contactId) => {
-    this.setState((prevState)=>({contacts: prevState.contacts.filter(contact => contact.id !== contactId)}));
+  deleteContact = contactId => {
+    this.setState(prevState => ({
+      contacts: prevState.contacts.filter(contact => contact.id !== contactId),
+    }));
+  };
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log(this.state.contacts);
+    localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
   };
 
   render() {

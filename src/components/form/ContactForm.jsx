@@ -5,6 +5,7 @@ export class ContactForm extends Component {
   state = {
     name: '',
     number: '',
+    id: '',
   };
 
   handleInputChange = e => {
@@ -18,7 +19,7 @@ export class ContactForm extends Component {
   };
 
   reset = () => {
-    this.setState({ name: '', number: '' });
+    this.setState({ name: '', number: '', id: '' });
   };
 
   render() {
